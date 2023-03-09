@@ -7,13 +7,16 @@ const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const http_1 = __importDefault(require("http"));
 const socket_io_1 = require("socket.io");
+const Router_1 = require("./Router");
 const app = (0, express_1.default)();
 const server = http_1.default.createServer(app);
 const io = new socket_io_1.Server(server);
 app.use((0, cors_1.default)());
+app.use(express_1.default.json());
 app.get('/', (req, res) => {
     res.status(200).send('<h2>Explore Creation Socket Server</h2>');
 });
+app.use('/email', Router_1.email);
 io.on('connection', socket => {
     console.log('A client has connected');
     socket.emit('connected-client', true);
