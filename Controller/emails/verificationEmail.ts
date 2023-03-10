@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-import { sendEmail } from '../utils';
+import { sendEmail } from '../../utils';
 
 type Data = {
 	success: boolean;
@@ -8,7 +8,7 @@ type Data = {
 	message?: string;
 };
 
-export default async function newsLetterEmail(req: Request, res: Response) {
+export default async function handler(req: Request, res: Response<Data>) {
 	try {
 		console.log(req?.body);
 		if (!req?.body?.email) {
@@ -22,7 +22,7 @@ export default async function newsLetterEmail(req: Request, res: Response) {
 
 		const { email } = req?.body;
 
-		const result = await sendEmail.subscribeNewsLetter({ email });
+		const result = await sendEmail.sendVerificationEmail({ email });
 
 		console.log(result);
 

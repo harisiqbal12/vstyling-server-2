@@ -1,0 +1,393 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+}
+
+model Wishlist {
+  id String @id @default(uuid())
+
+  product_id String?
+  product    Products? @relation(name: "wishlistProduct", fields: [product_id], references: [id])
+  user_id    String
+  user       Users?    @relation(name: "userWishlist", fields: [user_id], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model Coupons {
+  id             String   @id @default(uuid())
+  coupon         String   @unique
+  amount         Int
+  expirationDate DateTime
+  limit          Int
+  createdAt      DateTime @default(now())
+  users          Users[]  @relation("appliedCoupons")
+}
+
+model Transaction {
+  id        String          @id @default(uuid())
+  amount    Float
+  credit_id String?
+  stripeTrx String?
+  order_id  String?
+  type      TransactionType
+  createdAt DateTime        @default(now())
+  user_id   String?
+  credit    Credit?         @relation("creditTransaction", fields: [credit_id], references: [id])
+  user      Users?          @relation("userTransactions", fields: [user_id], references: [id])
+
+  order Orders? @relation(name: "orderTransaction", fields: [order_id], references: [id])
+}
+
+model NewsLetter {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+}
+
+model Reviews {
+  id         String   @id @default(uuid())
+  user_id    String
+  review     String
+  rating     Int
+  product_id String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  product    Products @relation("productReview", fields: [product_id], references: [id])
+  user       Users    @relation("userReview", fields: [user_id], references: [id])
+}
+
+model SliderImages {
+  id          String  @id @default(uuid())
+  images      String
+  header      String?
+  title       String?
+  description String?
+  link        String?
+
+  type      ImageType
+  createdAt DateTime  @default(now())
+}
+
+model Footer {
+  id        String     @id @default(uuid())
+  title     String
+  content   String
+  imageURI  String?
+  slug      String     @unique
+  type      FooterType
+  createdAt DateTime   @default(now())
+}
+
+model Auth {
+  id        String    @id @default(uuid())
+  oobCode   String    @unique
+  applied   Boolean?  @default(false)
+  mode      AuthModes
+  email     String
+  createdAt DateTime  @default(now())
+}
+
+model Credit {
+  id             String        @id @default(uuid())
+  amount         Int
+  userId         String
+  expirationDate DateTime
+  updatedAt      DateTime      @updatedAt
+  createdAt      DateTime      @default(now())
+  expired        Boolean?      @default(false)
+  user           Users         @relation("userCredits", fields: [userId], references: [id])
+  transaction    Transaction[] @relation("creditTransaction")
+  paid           Boolean       @default(false)
+}
+
+model Users {
+  id          String   @id @default(uuid())
+  name        String
+  email       String   @unique
+  number      String?  @unique
+  tier        Int?     @default(0)
+  emailverify Boolean? @default(false)
+  status      Boolean? @default(true)
+  lock        Boolean? @default(false)
+  businessId  String   @unique
+
+  createdAt    DateTime        @default(now())
+  addresses    Addresses[]     @relation("UsersAddresses")
+  credits      Credit[]        @relation("userCredits")
+  orders       Orders[]        @relation("userOrder")
+  reviews      Reviews[]       @relation("userReview")
+  transactions Transaction[]   @relation("userTransactions")
+  Shop         BusinessDetails @relation("userShop", fields: [businessId], references: [id])
+  coupons      Coupons[]       @relation("appliedCoupons")
+  wishlist     Wishlist[]      @relation("userWishlist")
+
+  approved Boolean? @default(false)
+}
+
+model BusinessDetails {
+  id              String   @id @default(uuid())
+  driverLicense   String   @unique
+  businessLicense String   @unique
+  companyName     String
+  salesTaxPermit  String   @unique
+  Dba             String   @unique
+  tobaccoPermit   String   @unique
+  businessAddress String
+  einNumber       String   @unique
+  shippingAddress String
+  docs            String[]
+  user            Users?   @relation("userShop")
+}
+
+model Addresses {
+  id             String   @id @default(uuid())
+  address        String
+  city           String?
+  postcode       String?
+  label          String?
+  firstName      String?
+  lastName       String?
+  number         String?
+  additionalInfo String?
+  user_id        String
+  createdAt      DateTime @default(now())
+  country        String
+  user           Users    @relation("UsersAddresses", fields: [user_id], references: [id])
+  orders         Orders[] @relation("orderAddress")
+}
+
+model Products {
+  id                String          @id @default(uuid())
+  name              String
+  slug              String          @unique
+  sku               String
+  code              String          @unique
+  imageURI          String
+  quantity          Int
+  purchase_price    Float
+  selling_price     Float
+  discount_price    Float
+  tier1_price       Float?
+  tier2_price       Float?
+  tier3_price       Float?
+  tier4_price       Float?
+  tags              String[]
+  galleryImage      String[]
+  short_description String?
+  long_description  String?
+  additional_info   String?
+  notes             String?
+  hot_deals         Boolean?        @default(false)
+  featured          Boolean?        @default(false)
+  new_arrival       Boolean?        @default(false)
+  special_offer     Boolean?        @default(false)
+  special_deals     Boolean?        @default(false)
+  status            Boolean?        @default(true)
+  main_category_id  String
+  sub_category_id   String?
+  brand_id          String?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  orderProduct      ProductOrders[] @relation("productsOrders")
+  brands            Brands?         @relation("Brands", fields: [brand_id], references: [id])
+  main_category     Categories      @relation("MainCategory", fields: [main_category_id], references: [id])
+  sub_category      Categories?     @relation("SubCategory", fields: [sub_category_id], references: [id])
+  reviews           Reviews[]       @relation("productReview")
+  variants          Variants[]      @relation("variantProduct")
+  filters           Filters[]       @relation("productFilters")
+
+  wishlist Wishlist[] @relation("wishlistProduct")
+}
+
+model Variants {
+  id         String      @id @default(uuid())
+  name       String
+  type       VariantTpes
+  required   Boolean?    @default(false)
+  product_id String?
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  variants   Variant[]   @relation("productVariants")
+  product    Products?   @relation("variantProduct", fields: [product_id], references: [id])
+}
+
+model Variant {
+  id            String          @id @default(uuid())
+  name          String
+  price         Float?
+  imageURI      String?
+  quantity      Int?
+  required      Boolean?        @default(false)
+  sku           String?         @unique
+  variantTypeId String
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  variantType   Variants        @relation("productVariants", fields: [variantTypeId], references: [id])
+  productOrder  ProductOrders[] @relation("orderProductVariant")
+}
+
+model Categories {
+  id           String          @id @default(uuid())
+  name         String
+  slug         String          @unique
+  imageURI     String?
+  active       Boolean?        @default(true)
+  icon         String?
+  type         CategoriesTypes
+  parentId     String?
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  description  String?
+  brand        Brands[]        @relation("brandCategories")
+  parent       Categories?     @relation("parentCategory", fields: [parentId], references: [id])
+  child        Categories[]    @relation("parentCategory")
+  filters      FilterType[]    @relation("filtersCategory")
+  MainProducts Products[]      @relation("MainCategory")
+  SubProducts  Products[]      @relation("SubCategory")
+}
+
+model Brands {
+  id           String       @id @default(uuid())
+  name         String
+  slug         String       @unique
+  imageURI     String?
+  category_id  String?
+  category     Categories?  @relation("brandCategories", fields: [category_id], references: [id])
+  filters      FilterType[] @relation("filtersBrands")
+  products     Products[]   @relation("Brands")
+  active       Boolean?     @default(true)
+  icon         String?
+  descriptions String?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+}
+
+model Orders {
+  id String @id @default(uuid())
+  // transaction_id String? @unique
+
+  total_price   Float
+  subtotal      Float
+  order_id      Int?            @unique @default(autoincrement())
+  order_status  OrderStatus?
+  address_id    String
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  type          OrderType
+  user_id       String?
+  Address       Addresses       @relation("orderAddress", fields: [address_id], references: [id])
+  user          Users?          @relation("userOrder", fields: [user_id], references: [id])
+  orderProducts ProductOrders[] @relation("orderProducts")
+
+  transaction Transaction[] @relation(name: "orderTransaction")
+}
+
+model ProductOrders {
+  id             String    @id @default(uuid())
+  productId      String
+  quantity       Int?      @default(1)
+  purchasedPrice Float
+  generatedSku   String
+  order_id       String
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  order          Orders    @relation("orderProducts", fields: [order_id], references: [id])
+  product        Products  @relation("productsOrders", fields: [productId], references: [id])
+  variant        Variant[] @relation("orderProductVariant")
+}
+
+model FilterType {
+  id          String      @id @default(uuid())
+  name        String
+  slug        String
+  category_id String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @default(now())
+  brand_id    String?
+  brand       Brands?     @relation("filtersBrands", fields: [brand_id], references: [id])
+  category    Categories? @relation("filtersCategory", fields: [category_id], references: [id])
+  filters     Filters[]   @relation("additionalFilters")
+}
+
+model Filters {
+  id           String      @id @default(uuid())
+  name         String
+  slug         String
+  filterTypeId String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @default(now())
+  filtersTypes FilterType? @relation("additionalFilters", fields: [filterTypeId], references: [id])
+  products     Products[]  @relation("productFilters")
+}
+
+enum CategoriesTypes {
+  MAIN
+  SUB
+}
+
+enum VariantTpes {
+  COLORS
+  SIZES
+  LIQUIDS
+  BATTERIES
+  CHARGERS
+  CUSTOMS
+}
+
+enum OrderStatus {
+  PROCESSING
+  SHIPPED
+  COMPLETED
+  CANCELLED
+}
+
+enum BusinessSellerType {
+  SHOPOWNER
+  JOBBER
+  DISTRIBUTER
+}
+
+enum BusinesType {
+  VAPESHOP
+  SMOKESHOP
+  DISPENSARY
+  PACKAGING
+}
+
+enum ImageType {
+  MAIN
+  SECONDARY
+  THIRD
+  FOURTH
+  FIFTH
+}
+
+enum FooterType {
+  ONLINEHELP
+  ABOUTUS
+  VAPING
+  LEGAL
+}
+
+enum AuthModes {
+  verifyEmail
+  passwordReset
+}
+
+enum OrderType {
+  CARD
+  CREDIT
+  HYBRID
+}
+
+enum TransactionType {
+  STRIPE
+  CREDIT
+  CREDITPAYMENT
+}

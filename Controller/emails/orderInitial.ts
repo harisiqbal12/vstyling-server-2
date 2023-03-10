@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-import { sendEmail } from '../utils';
+import { sendEmail } from '../../utils';
 
 type Data = {
 	success: boolean;
@@ -8,9 +8,8 @@ type Data = {
 	message?: string;
 };
 
-export default async function orderStatus(req: Request, res: Response<Data>) {
+export default async function handler(req: Request, res: Response<Data>) {
 	try {
-		console.log(req?.body);
 		if (!req?.body?.email) {
 			res.status(400).json({
 				success: false,
@@ -20,7 +19,7 @@ export default async function orderStatus(req: Request, res: Response<Data>) {
 			return;
 		}
 
-		if (!req?.body?.status) {
+		if (!req?.body?.link) {
 			res.status(400).json({
 				success: false,
 				error: true,
@@ -38,9 +37,18 @@ export default async function orderStatus(req: Request, res: Response<Data>) {
 			return;
 		}
 
-		const { email, status, orderId } = req?.body;
+		if (!req?.body?.data) {
+			res.status(400).json({
+				success: false,
+				error: true,
+				message: 'Provide data',
+			});
+			return;
+		}
 
-		await sendEmail.orderStatus({ email, status, orderId });
+		const { email, link, orderId, data } = req?.body;
+
+		await sendEmail.orderInitial({ email, link, orderId, data });
 
 		res.status(200).json({
 			success: true,

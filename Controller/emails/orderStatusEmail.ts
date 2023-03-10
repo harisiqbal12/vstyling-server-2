@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-import { sendEmail } from '../utils';
+import { sendEmail } from '../../utils';
 
 type Data = {
 	success: boolean;
@@ -8,7 +8,7 @@ type Data = {
 	message?: string;
 };
 
-export default async function resetPasssword(req: Request, res: Response<Data>) {
+export default async function handler(req: Request, res: Response<Data>) {
 	try {
 		console.log(req?.body);
 		if (!req?.body?.email) {
@@ -20,7 +20,7 @@ export default async function resetPasssword(req: Request, res: Response<Data>) 
 			return;
 		}
 
-		if (!req?.body?.link) {
+		if (!req?.body?.status) {
 			res.status(400).json({
 				success: false,
 				error: true,
@@ -29,9 +29,18 @@ export default async function resetPasssword(req: Request, res: Response<Data>) 
 			return;
 		}
 
-		const { email, link } = req?.body;
+		if (!req?.body?.orderId) {
+			res.status(400).json({
+				success: false,
+				error: true,
+				message: 'Provide order id',
+			});
+			return;
+		}
 
-		await sendEmail.resetPassword({ email, link });
+		const { email, status, orderId } = req?.body;
+
+		await sendEmail.orderStatus({ email, status, orderId });
 
 		res.status(200).json({
 			success: true,

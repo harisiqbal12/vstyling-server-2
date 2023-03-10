@@ -1,19 +1,13 @@
 import express from 'express';
 
-import {
-	sendVerificationEmail,
-	newsLetterEmail,
-	resetPassword,
-	orderStatus,
-	orderInitial,
-} from '../../Controller/index';
+import { emails } from '../../Controller/index';
 
 const router = express.Router();
 
-router.route('/verificationEmail').post(sendVerificationEmail);
-router.route('/news-letter').post(newsLetterEmail);
-router.route('/reset-password').post(resetPassword);
-router.route('/order-status').post(orderStatus);
-router.route('/order').post(orderInitial);
+router.route('/verificationEmail').post(emails.sendVerificationEmail);
+router.route('/news-letter').post(emails.newsLetterEmail);
+router.route('/reset-password').post(emails.resetPassword);
+router.route('/order-status').post(emails.orderStatus);
+router.route('/order').post(emails.orderInitial);
 
 export default router;

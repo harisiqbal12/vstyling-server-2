@@ -3,7 +3,7 @@ import cors from 'cors';
 import http from 'http';
 import { Server } from 'socket.io';
 
-import { email } from './Router';
+import router from './Router/router';
 
 const app = express();
 const server = http.createServer(app);
@@ -12,11 +12,7 @@ const io = new Server(server);
 app.use(cors());
 app.use(express.json());
 
-app.get('/', (req: Request, res: Response) => {
-	res.status(200).send('<h2>Explore Creation Socket Server</h2>');
-});
-
-app.use('/email', email);
+app.use('/', router);
 
 io.on('connection', socket => {
 	console.log('A client has connected');
