@@ -18,14 +18,14 @@ class SendMail {
             },
         });
     }
-    sendVerificationEmail({ email }) {
+    sendVerificationEmail({ email, link }) {
         return new Promise((resolve, reject) => {
             var _a;
             (_a = this.transporter) === null || _a === void 0 ? void 0 : _a.sendMail({
                 from: "'Xplorecreations' <no-reply@services.xplorecreations.com>",
                 to: email,
                 subject: 'Welcome to Xplorecreation',
-                html: templates_1.default.verificationTemplate(),
+                html: templates_1.default.verificationTemplate({ link }),
             }).then(res => {
                 resolve(res);
             }).catch(err => {
@@ -48,14 +48,14 @@ class SendMail {
             });
         });
     }
-    resetPassword({ email }) {
+    resetPassword({ email, link }) {
         return new Promise((resolve, reject) => {
             var _a;
             (_a = this === null || this === void 0 ? void 0 : this.transporter) === null || _a === void 0 ? void 0 : _a.sendMail({
                 from: "'Xplorecreations' <no-reply@services.xplorecreations.com>",
                 to: email,
                 subject: 'Reset password',
-                html: templates_1.default.resetPassword(),
+                html: templates_1.default.resetPassword({ link }),
             }).then(res => {
                 resolve(res);
             }).catch(err => {
@@ -78,7 +78,7 @@ class SendMail {
             });
         });
     }
-    orderInitial({ email, link, orderId, data }) {
+    orderInitial({ email, link, orderId, data, }) {
         return new Promise((resolve, reject) => {
             var _a;
             (_a = this === null || this === void 0 ? void 0 : this.transporter) === null || _a === void 0 ? void 0 : _a.sendMail({

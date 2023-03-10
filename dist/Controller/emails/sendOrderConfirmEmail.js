@@ -8,14 +8,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const utils_1 = require("../../utils");
-const sendverification_1 = __importDefault(require("../user/sendverification"));
 function handler(req, res) {
-    var _a;
+    var _a, _b, _c, _d;
     return __awaiter(this, void 0, void 0, function* () {
         try {
             if (!((_a = req === null || req === void 0 ? void 0 : req.body) === null || _a === void 0 ? void 0 : _a.email)) {
@@ -26,16 +22,38 @@ function handler(req, res) {
                 });
                 return;
             }
-            const { email } = req === null || req === void 0 ? void 0 : req.body;
-            const link = yield (0, sendverification_1.default)(email);
-            yield utils_1.sendEmail.sendVerificationEmail({ email, link });
+            if (!((_b = req === null || req === void 0 ? void 0 : req.body) === null || _b === void 0 ? void 0 : _b.link)) {
+                res.status(400).json({
+                    success: false,
+                    error: true,
+                    message: 'Provide link',
+                });
+                return;
+            }
+            if (!((_c = req === null || req === void 0 ? void 0 : req.body) === null || _c === void 0 ? void 0 : _c.orderId)) {
+                res.status(400).json({
+                    success: false,
+                    error: true,
+                    message: 'Provide order id',
+                });
+                return;
+            }
+            if (!((_d = req === null || req === void 0 ? void 0 : req.body) === null || _d === void 0 ? void 0 : _d.data)) {
+                res.status(400).json({
+                    success: false,
+                    error: true,
+                    message: 'Provide data',
+                });
+                return;
+            }
+            const { email, link, orderId, data } = req === null || req === void 0 ? void 0 : req.body;
+            yield utils_1.sendEmail.orderInitial({ email, link, orderId, data });
             res.status(200).json({
                 success: true,
                 error: false,
             });
         }
         catch (err) {
-            console.log(err);
             res.status(500).json({
                 success: false,
                 error: true,

@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 
 import { sendEmail } from '../../utils';
+import generateLink from '../../utils/users/generateResetPassword';
+import prisma from '../../prisma';
 
 type Data = {
 	success: boolean;
@@ -10,7 +12,6 @@ type Data = {
 
 export default async function handler(req: Request, res: Response<Data>) {
 	try {
-		console.log(req?.body);
 		if (!req?.body?.email) {
 			res.status(400).json({
 				success: false,
@@ -22,9 +23,17 @@ export default async function handler(req: Request, res: Response<Data>) {
 
 		const { email } = req?.body;
 
-		const result = await sendEmail.sendVerificationEmail({ email });
+		const link = await generateLink(email);
 
-		console.log(result);
+		await sendEmail.resetPassword({ email, link });
+
+		await prisma.auth.create({
+			data: {
+				email,
+				mode: 'passwordReset',
+				oobCode: link?.split('oobCode=')[1]?.split('&')[0],
+			},
+		});
 
 		res.status(200).json({
 			success: true,
@@ -37,4 +46,12 @@ export default async function handler(req: Request, res: Response<Data>) {
 			message: 'Internal server error',
 		});
 	}
+	prisma
+		.$disconnect()
+		.then(res => {
+			console.log('disconnected');
+		})
+		.catch(err => {
+			console.log('error at disconnected');
+		});
 }

@@ -8,16 +8,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const utils_1 = require("../../utils");
-const sendverification_1 = __importDefault(require("../user/sendverification"));
 function handler(req, res) {
     var _a;
     return __awaiter(this, void 0, void 0, function* () {
         try {
+            console.log(req === null || req === void 0 ? void 0 : req.body);
             if (!((_a = req === null || req === void 0 ? void 0 : req.body) === null || _a === void 0 ? void 0 : _a.email)) {
                 res.status(400).json({
                     success: false,
@@ -27,15 +24,14 @@ function handler(req, res) {
                 return;
             }
             const { email } = req === null || req === void 0 ? void 0 : req.body;
-            const link = yield (0, sendverification_1.default)(email);
-            yield utils_1.sendEmail.sendVerificationEmail({ email, link });
+            const result = yield utils_1.sendEmail.subscribeNewsLetter({ email });
+            console.log(result);
             res.status(200).json({
                 success: true,
                 error: false,
             });
         }
         catch (err) {
-            console.log(err);
             res.status(500).json({
                 success: false,
                 error: true,

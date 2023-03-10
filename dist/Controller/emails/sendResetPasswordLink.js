@@ -13,9 +13,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const utils_1 = require("../../utils");
-const sendverification_1 = __importDefault(require("../user/sendverification"));
+const generateResetPassword_1 = __importDefault(require("../../utils/users/generateResetPassword"));
+const prisma_1 = __importDefault(require("../../prisma"));
 function handler(req, res) {
-    var _a;
+    var _a, _b;
     return __awaiter(this, void 0, void 0, function* () {
         try {
             if (!((_a = req === null || req === void 0 ? void 0 : req.body) === null || _a === void 0 ? void 0 : _a.email)) {
@@ -27,21 +28,35 @@ function handler(req, res) {
                 return;
             }
             const { email } = req === null || req === void 0 ? void 0 : req.body;
-            const link = yield (0, sendverification_1.default)(email);
-            yield utils_1.sendEmail.sendVerificationEmail({ email, link });
+            const link = yield (0, generateResetPassword_1.default)(email);
+            yield utils_1.sendEmail.resetPassword({ email, link });
+            yield prisma_1.default.auth.create({
+                data: {
+                    email,
+                    mode: 'passwordReset',
+                    oobCode: (_b = link === null || link === void 0 ? void 0 : link.split('oobCode=')[1]) === null || _b === void 0 ? void 0 : _b.split('&')[0],
+                },
+            });
             res.status(200).json({
                 success: true,
                 error: false,
             });
         }
         catch (err) {
-            console.log(err);
             res.status(500).json({
                 success: false,
                 error: true,
                 message: 'Internal server error',
             });
         }
+        prisma_1.default
+            .$disconnect()
+            .then(res => {
+            console.log('disconnected');
+        })
+            .catch(err => {
+            console.log('error at disconnected');
+        });
     });
 }
 exports.default = handler;

@@ -13,7 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const utils_1 = require("../../utils");
-const sendverification_1 = __importDefault(require("../user/sendverification"));
+const generateVerification_1 = __importDefault(require("../../utils/users/generateVerification"));
 function handler(req, res) {
     var _a;
     return __awaiter(this, void 0, void 0, function* () {
@@ -27,7 +27,7 @@ function handler(req, res) {
                 return;
             }
             const { email } = req === null || req === void 0 ? void 0 : req.body;
-            const link = yield (0, sendverification_1.default)(email);
+            const link = yield (0, generateVerification_1.default)(email);
             yield utils_1.sendEmail.sendVerificationEmail({ email, link });
             res.status(200).json({
                 success: true,

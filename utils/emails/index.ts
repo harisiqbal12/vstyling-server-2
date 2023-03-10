@@ -16,14 +16,14 @@ class SendMail {
 		});
 	}
 
-	sendVerificationEmail({ email }: { email: string }) {
+	sendVerificationEmail({ email, link }: { email: string; link: string }) {
 		return new Promise((resolve, reject) => {
 			this.transporter
 				?.sendMail({
 					from: "'Xplorecreations' <no-reply@services.xplorecreations.com>",
 					to: email,
 					subject: 'Welcome to Xplorecreation',
-					html: Template.verificationTemplate(),
+					html: Template.verificationTemplate({ link }),
 				})
 				.then(res => {
 					resolve(res);
@@ -52,14 +52,14 @@ class SendMail {
 		});
 	}
 
-	resetPassword({ email }: { email: string; link: string }) {
+	resetPassword({ email, link }: { email: string; link: string }) {
 		return new Promise((resolve, reject) => {
 			this?.transporter
 				?.sendMail({
 					from: "'Xplorecreations' <no-reply@services.xplorecreations.com>",
 					to: email,
 					subject: 'Reset password',
-					html: Template.resetPassword(),
+					html: Template.resetPassword({ link }),
 				})
 				.then(res => {
 					resolve(res);
@@ -96,7 +96,17 @@ class SendMail {
 		});
 	}
 
-	orderInitial({email, link, orderId, data}: { email: string; link: string; orderId: string; data: any }) {
+	orderInitial({
+		email,
+		link,
+		orderId,
+		data,
+	}: {
+		email: string;
+		link: string;
+		orderId: string;
+		data: any;
+	}) {
 		return new Promise((resolve, reject) => {
 			this?.transporter
 				?.sendMail({

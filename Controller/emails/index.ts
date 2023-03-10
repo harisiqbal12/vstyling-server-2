@@ -1,5 +1,5 @@
-export { default as sendVerificationEmail } from './verificationEmail';
-export { default as newsLetterEmail } from './newsLetter';
-export { default as resetPassword } from './resetPassword';
-export { default as orderStatus } from './orderStatusEmail';
-export { default as orderInitial } from './orderInitial';
+export { default as sendVerificationEmail } from './sendVerificationEmail';
+export { default as sendNewsLetterEmail } from './sendNewsLetterEmail';
+export { default as sendResetPasswordEmail } from './sendResetPasswordLink';
+export { default as sendOrderStatusEmail } from './sendOrderStatusEmail';
+export { default as sendOrderConfirmEmail } from './sendOrderConfirmEmail';

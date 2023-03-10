@@ -8,10 +8,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const utils_1 = require("../../utils");
+const resetPassword_1 = __importDefault(require("../user/resetPassword"));
 function handler(req, res) {
-    var _a, _b;
+    var _a;
     return __awaiter(this, void 0, void 0, function* () {
         try {
             console.log(req === null || req === void 0 ? void 0 : req.body);
@@ -23,15 +27,9 @@ function handler(req, res) {
                 });
                 return;
             }
-            if (!((_b = req === null || req === void 0 ? void 0 : req.body) === null || _b === void 0 ? void 0 : _b.link)) {
-                res.status(400).json({
-                    success: false,
-                    error: true,
-                    message: 'Provide link',
-                });
-                return;
-            }
-            const { email, link } = req === null || req === void 0 ? void 0 : req.body;
+            const { email } = req === null || req === void 0 ? void 0 : req.body;
+            const link = yield (0, resetPassword_1.default)(email);
+            console.log(link);
             yield utils_1.sendEmail.resetPassword({ email, link });
             res.status(200).json({
                 success: true,
