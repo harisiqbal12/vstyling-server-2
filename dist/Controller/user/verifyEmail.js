@@ -39,35 +39,34 @@ const admin = __importStar(require("firebase-admin"));
 const prisma_1 = __importDefault(require("../../prisma"));
 const xplorecreations_json_1 = __importDefault(require("../../xplorecreations.json"));
 function handler(req, res) {
-    var _a, _b;
+    var _a;
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            if (!((_a = req === null || req === void 0 ? void 0 : req.body) === null || _a === void 0 ? void 0 : _a.password) || !((_b = req === null || req === void 0 ? void 0 : req.body) === null || _b === void 0 ? void 0 : _b.oobCode)) {
-                res.status(400).json({
-                    success: true,
-                    error: false,
-                    reason: 'Email or password or oobcode not found',
-                });
+            if (!((_a = req === null || req === void 0 ? void 0 : req.body) === null || _a === void 0 ? void 0 : _a.oobCode)) {
+                res
+                    .status(400)
+                    .json({ success: false, error: true, message: 'Oobcode not found' });
                 return;
             }
-            const { password, oobCode } = req === null || req === void 0 ? void 0 : req.body;
-            const result = yield prisma_1.default.auth.findFirst({
+            const { oobCode } = req === null || req === void 0 ? void 0 : req.body;
+            const result = yield prisma_1.default.auth.findUnique({
                 where: {
-                    AND: [
-                        {
-                            oobCode,
-                        },
-                        {
-                            applied: false,
-                        },
-                    ],
+                    oobCode,
                 },
             });
-            if (!(result === null || result === void 0 ? void 0 : result.id)) {
+            if (!result) {
                 res.status(200).json({
                     success: false,
                     error: true,
-                    reason: 'Invalid link or link expired',
+                    message: 'Invalid oobcode, oobcode not found',
+                });
+                return;
+            }
+            if (result.applied === true) {
+                res.status(200).json({
+                    success: false,
+                    error: true,
+                    message: 'Oobcode already applied',
                 });
                 return;
             }
@@ -78,13 +77,21 @@ function handler(req, res) {
             if (Math.abs(Math.round(diff)) > 10) {
                 res
                     .status(200)
-                    .json({ success: false, error: true, reason: 'Link expired' });
+                    .json({ success: false, error: true, message: 'Link expired' });
                 return;
             }
             if (admin.apps.length) {
-                const user = yield admin.auth(admin.app()).getUserByEmail(result === null || result === void 0 ? void 0 : result.email);
+                const user = yield admin.auth(admin.app()).getUserByEmail(result.email);
                 yield admin.auth(admin.app()).updateUser(user.uid, {
-                    password,
+                    emailVerified: true,
+                });
+                yield prisma_1.default.users.update({
+                    where: {
+                        email: result === null || result === void 0 ? void 0 : result.email,
+                    },
+                    data: {
+                        emailverify: true,
+                    },
                 });
                 yield prisma_1.default.auth.update({
                     where: {
@@ -94,16 +101,16 @@ function handler(req, res) {
                         applied: true,
                     },
                 });
-                res.status(200).json({ success: true, error: false, reason: null });
+                res.status(200).json({ success: true, error: false });
                 return;
             }
             admin.initializeApp({
                 //@ts-ignore
                 credential: admin.credential.cert(xplorecreations_json_1.default),
             });
-            const user = yield admin.auth(admin.app()).getUserByEmail(result === null || result === void 0 ? void 0 : result.email);
+            const user = yield admin.auth(admin.app()).getUserByEmail(result.email);
             yield admin.auth(admin.app()).updateUser(user.uid, {
-                password,
+                emailVerified: true,
             });
             yield prisma_1.default.auth.update({
                 where: {
@@ -113,14 +120,22 @@ function handler(req, res) {
                     applied: true,
                 },
             });
-            res.status(200).json({ success: true, error: false, reason: null });
-            return;
+            yield prisma_1.default.users.update({
+                where: {
+                    email: result === null || result === void 0 ? void 0 : result.email,
+                },
+                data: {
+                    emailverify: true,
+                },
+            });
+            res.status(200).json({ success: true, error: false });
         }
         catch (err) {
-            console.log(err);
-            res
-                .status(500)
-                .json({ success: false, error: true, reason: 'Internal server error' });
+            res.status(500).json({
+                success: false,
+                error: true,
+                message: 'Internal server error',
+            });
         }
     });
 }

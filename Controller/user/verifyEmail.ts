@@ -1,50 +1,47 @@
 import { Request, Response } from 'express';
 import * as admin from 'firebase-admin';
-
 import prisma from '../../prisma';
-
 import serviceAccount from '../../xplorecreations.json';
 
 type Data = {
 	success: boolean;
 	error: boolean;
-	reason: string | null;
-	data?: string;
+	message?: string;
 };
 
 export default async function handler(req: Request, res: Response<Data>) {
 	try {
-		if (!req?.body?.password || !req?.body?.oobCode) {
-			res.status(400).json({
-				success: true,
-				error: false,
-				reason: 'Email or password or oobcode not found',
+		if (!req?.body?.oobCode) {
+			res
+				.status(400)
+				.json({ success: false, error: true, message: 'Oobcode not found' });
+			return;
+		}
+
+		const { oobCode } = req?.body;
+
+		const result = await prisma.auth.findUnique({
+			where: {
+				oobCode,
+			},
+		});
+
+		if (!result) {
+			res.status(200).json({
+				success: false,
+				error: true,
+				message: 'Invalid oobcode, oobcode not found',
 			});
 			return;
 		}
 
-		const { password, oobCode }: { password: string; oobCode: string } =
-			req?.body;
-
-		const result = await prisma.auth.findFirst({
-			where: {
-				AND: [
-					{
-						oobCode,
-					},
-					{
-						applied: false,
-					},
-				],
-			},
-		});
-
-		if (!result?.id) {
+		if (result.applied === true) {
 			res.status(200).json({
 				success: false,
 				error: true,
-				reason: 'Invalid link or link expired',
+				message: 'Oobcode already applied',
 			});
+
 			return;
 		}
 
@@ -57,15 +54,25 @@ export default async function handler(req: Request, res: Response<Data>) {
 		if (Math.abs(Math.round(diff)) > 10) {
 			res
 				.status(200)
-				.json({ success: false, error: true, reason: 'Link expired' });
+				.json({ success: false, error: true, message: 'Link expired' });
 			return;
 		}
 
 		if (admin.apps.length) {
-			const user = await admin.auth(admin.app()).getUserByEmail(result?.email);
+			const user = await admin.auth(admin.app()).getUserByEmail(result.email);
 
 			await admin.auth(admin.app()).updateUser(user.uid, {
-				password,
+				emailVerified: true,
+			});
+
+			await prisma.users.update({
+				where: {
+					email: result?.email,
+				},
+
+				data: {
+					emailverify: true,
+				},
 			});
 
 			await prisma.auth.update({
@@ -77,8 +84,7 @@ export default async function handler(req: Request, res: Response<Data>) {
 				},
 			});
 
-			res.status(200).json({ success: true, error: false, reason: null });
-
+			res.status(200).json({ success: true, error: false });
 			return;
 		}
 
@@ -87,10 +93,10 @@ export default async function handler(req: Request, res: Response<Data>) {
 			credential: admin.credential.cert(serviceAccount),
 		});
 
-		const user = await admin.auth(admin.app()).getUserByEmail(result?.email);
+		const user = await admin.auth(admin.app()).getUserByEmail(result.email);
 
 		await admin.auth(admin.app()).updateUser(user.uid, {
-			password,
+			emailVerified: true,
 		});
 
 		await prisma.auth.update({
@@ -101,13 +107,23 @@ export default async function handler(req: Request, res: Response<Data>) {
 				applied: true,
 			},
 		});
+    
+		await prisma.users.update({
+			where: {
+				email: result?.email,
+			},
 
-		res.status(200).json({ success: true, error: false, reason: null });
-		return;
+			data: {
+				emailverify: true,
+			},
+		});
+
+		res.status(200).json({ success: true, error: false });
 	} catch (err) {
-		console.log(err);
-		res
-			.status(500)
-			.json({ success: false, error: true, reason: 'Internal server error' });
+		res.status(500).json({
+			success: false,
+			error: true,
+			message: 'Internal server error',
+		});
 	}
 }

@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 
 import { sendEmail } from '../../utils';
 import generateLink from '../../utils/users/generateVerification';
+import prisma from '../../prisma';
 
 type Data = {
 	success: boolean;
@@ -23,9 +24,16 @@ export default async function handler(req: Request, res: Response<Data>) {
 		const { email } = req?.body;
 
 		const link = await generateLink(email);
-	
 
 		await sendEmail.sendVerificationEmail({ email, link });
+
+		await prisma.auth.create({
+			data: {
+				email,
+				mode: 'verifyEmail',
+				oobCode: link?.split('oobCode=')[1]?.split('&')[0],
+			},
+		});
 
 		res.status(200).json({
 			success: true,
