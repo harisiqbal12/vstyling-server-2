@@ -10,5 +10,5 @@ router.route('/verification').post(index_1.emails.sendVerificationEmail);
 router.route('/news-letter').post(index_1.emails.sendNewsLetterEmail);
 router.route('/reset-password').post(index_1.emails.sendResetPasswordEmail);
 router.route('/order-status').post(index_1.emails.sendOrderStatusEmail);
-router.route('/order').post(index_1.emails.sendOrderConfirmEmail);
+router.route('/order-confirm').post(index_1.emails.sendOrderConfirmEmail);
 exports.default = router;

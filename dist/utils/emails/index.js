@@ -63,14 +63,14 @@ class SendMail {
             });
         });
     }
-    orderStatus({ email, status, orderId, }) {
+    orderStatus({ email, status, orderId, name, }) {
         return new Promise((resolve, reject) => {
             var _a;
             (_a = this === null || this === void 0 ? void 0 : this.transporter) === null || _a === void 0 ? void 0 : _a.sendMail({
                 from: "'Xplorecreations' <no-reply@services.xplorecreations.com>",
                 to: email,
                 subject: 'Order status updated',
-                html: templates_1.default.orderStatus(),
+                html: templates_1.default.orderStatus({ status, id: orderId, name }),
             }).then(res => {
                 resolve(res);
             }).catch(err => {
@@ -78,14 +78,14 @@ class SendMail {
             });
         });
     }
-    orderInitial({ email, link, orderId, data, }) {
+    orderInitial({ email, data, total, subtotal, }) {
         return new Promise((resolve, reject) => {
             var _a;
             (_a = this === null || this === void 0 ? void 0 : this.transporter) === null || _a === void 0 ? void 0 : _a.sendMail({
                 from: "'Xplorecreations' <no-reply@services.xplorecreations.com>",
                 to: email,
                 subject: 'Order confirm',
-                html: templates_1.default.orderConfirm(),
+                html: templates_1.default.orderConfirm({ data, total, subtotal }),
             }).then(res => {
                 resolve(res);
             }).catch(err => {

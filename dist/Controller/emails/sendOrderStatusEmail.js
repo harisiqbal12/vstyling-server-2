@@ -11,10 +11,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const utils_1 = require("../../utils");
 function handler(req, res) {
-    var _a, _b, _c;
+    var _a, _b, _c, _d;
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            console.log(req === null || req === void 0 ? void 0 : req.body);
             if (!((_a = req === null || req === void 0 ? void 0 : req.body) === null || _a === void 0 ? void 0 : _a.email)) {
                 res.status(400).json({
                     success: false,
@@ -39,8 +38,17 @@ function handler(req, res) {
                 });
                 return;
             }
-            const { email, status, orderId } = req === null || req === void 0 ? void 0 : req.body;
-            yield utils_1.sendEmail.orderStatus({ email, status, orderId });
+            if (!((_d = req === null || req === void 0 ? void 0 : req.body) === null || _d === void 0 ? void 0 : _d.name)) {
+                res.status(400).json({
+                    success: false,
+                    error: true,
+                    message: 'Provide customer name',
+                });
+                return;
+            }
+            console.log(req === null || req === void 0 ? void 0 : req.body);
+            const { email, status, orderId, name } = req === null || req === void 0 ? void 0 : req.body;
+            yield utils_1.sendEmail.orderStatus({ email, status, orderId, name });
             res.status(200).json({
                 success: true,
                 error: false,

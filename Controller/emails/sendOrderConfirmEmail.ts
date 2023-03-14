@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 
 import { sendEmail } from '../../utils';
+import prisma from '../../prisma';
 
 type Data = {
 	success: boolean;
@@ -10,24 +11,6 @@ type Data = {
 
 export default async function handler(req: Request, res: Response<Data>) {
 	try {
-		if (!req?.body?.email) {
-			res.status(400).json({
-				success: false,
-				error: true,
-				message: 'Provide email',
-			});
-			return;
-		}
-
-		if (!req?.body?.link) {
-			res.status(400).json({
-				success: false,
-				error: true,
-				message: 'Provide link',
-			});
-			return;
-		}
-
 		if (!req?.body?.orderId) {
 			res.status(400).json({
 				success: false,
@@ -37,18 +20,9 @@ export default async function handler(req: Request, res: Response<Data>) {
 			return;
 		}
 
-		if (!req?.body?.data) {
-			res.status(400).json({
-				success: false,
-				error: true,
-				message: 'Provide data',
-			});
-			return;
-		}
+		const { email, data, total, subtotal } = req?.body;
 
-		const { email, link, orderId, data } = req?.body;
-
-		await sendEmail.orderInitial({ email, link, orderId, data });
+		await sendEmail.orderInitial({ email, data, total, subtotal });
 
 		res.status(200).json({
 			success: true,

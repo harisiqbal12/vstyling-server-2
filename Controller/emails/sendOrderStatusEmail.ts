@@ -10,7 +10,6 @@ type Data = {
 
 export default async function handler(req: Request, res: Response<Data>) {
 	try {
-		console.log(req?.body);
 		if (!req?.body?.email) {
 			res.status(400).json({
 				success: false,
@@ -38,9 +37,21 @@ export default async function handler(req: Request, res: Response<Data>) {
 			return;
 		}
 
-		const { email, status, orderId } = req?.body;
+		if (!req?.body?.name) {
+			res.status(400).json({
+				success: false,
+				error: true,
+				message: 'Provide customer name',
+			});
 
-		await sendEmail.orderStatus({ email, status, orderId });
+			return;
+		}
+
+		console.log(req?.body)
+
+		const { email, status, orderId, name } = req?.body;
+
+		await sendEmail.orderStatus({ email, status, orderId, name });
 
 		res.status(200).json({
 			success: true,

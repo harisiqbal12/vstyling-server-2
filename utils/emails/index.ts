@@ -74,10 +74,12 @@ class SendMail {
 		email,
 		status,
 		orderId,
+		name,
 	}: {
 		email: string;
 		status: string;
 		orderId: string;
+		name: string;
 	}) {
 		return new Promise((resolve, reject) => {
 			this?.transporter
@@ -85,7 +87,7 @@ class SendMail {
 					from: "'Xplorecreations' <no-reply@services.xplorecreations.com>",
 					to: email,
 					subject: 'Order status updated',
-					html: Template.orderStatus(),
+					html: Template.orderStatus({ status, id: orderId, name }),
 				})
 				.then(res => {
 					resolve(res);
@@ -98,14 +100,20 @@ class SendMail {
 
 	orderInitial({
 		email,
-		link,
-		orderId,
 		data,
+		total,
+		subtotal,
 	}: {
 		email: string;
-		link: string;
-		orderId: string;
-		data: any;
+		data: Array<{
+			quantity: number;
+			name: string;
+			imageURI: string;
+			sku: string;
+			price: number;
+		}>;
+		total: string;
+		subtotal: string;
 	}) {
 		return new Promise((resolve, reject) => {
 			this?.transporter
@@ -113,7 +121,7 @@ class SendMail {
 					from: "'Xplorecreations' <no-reply@services.xplorecreations.com>",
 					to: email,
 					subject: 'Order confirm',
-					html: Template.orderConfirm(),
+					html: Template.orderConfirm({ data, total, subtotal }),
 				})
 				.then(res => {
 					resolve(res);
