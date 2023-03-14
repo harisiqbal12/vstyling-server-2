@@ -4977,7 +4977,7 @@ mso-hide:all;
 																				font-size: 12px;
 																			"
 																		>
-																			Style Casual&nbsp;© 2021 Style Casual, Inc.
+																			Xplorecreations &nbsp;© ${new Date(Date.now()).getFullYear()} Xplorecreations, Inc.
 																			All Rights Reserved.
 																		</p>
 																		<p

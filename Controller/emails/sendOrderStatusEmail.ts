@@ -23,7 +23,7 @@ export default async function handler(req: Request, res: Response<Data>) {
 			res.status(400).json({
 				success: false,
 				error: true,
-				message: 'Provide link',
+				message: 'Provide status',
 			});
 			return;
 		}
