@@ -45,13 +45,14 @@ export default async function handler(req: Request, res: Response<Data>) {
 			error: true,
 			message: 'Internal server error',
 		});
+	} finally {
+		prisma
+			.$disconnect()
+			.then(res => {
+				console.log('disconnected');
+			})
+			.catch(err => {
+				console.log('error at disconnected');
+			});
 	}
-	prisma
-		.$disconnect()
-		.then(res => {
-			console.log('disconnected');
-		})
-		.catch(err => {
-			console.log('error at disconnected');
-		});
 }

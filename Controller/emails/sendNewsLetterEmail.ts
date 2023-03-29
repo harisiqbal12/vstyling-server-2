@@ -2,11 +2,6 @@ import { Request, Response } from 'express';
 
 import { sendEmail } from '../../utils';
 
-type Data = {
-	success: boolean;
-	error: boolean;
-	message?: string;
-};
 
 export default async function handler(req: Request, res: Response) {
 	try {

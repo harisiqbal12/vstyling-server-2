@@ -3,6 +3,7 @@ import express from 'express';
 import validation from './validation';
 import email from './emails';
 import actions from './actions';
+import auth from './auth';
 
 const router = express.Router();
 
@@ -13,5 +14,6 @@ router.route('/').get((_req, res) => {
 router.use('/validation', validation);
 router.use('/email', email);
 router.use('/actions', actions);
+router.use('/auth', auth);
 
 export default router;

@@ -137,6 +137,16 @@ function handler(req, res) {
                 message: 'Internal server error',
             });
         }
+        finally {
+            prisma_1.default
+                .$disconnect()
+                .then(res => {
+                console.log('prisma disconnected');
+            })
+                .catch(err => {
+                console.log('error disconecting prisma');
+            });
+        }
     });
 }
 exports.default = handler;

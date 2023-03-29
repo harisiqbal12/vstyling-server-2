@@ -49,14 +49,16 @@ function handler(req, res) {
                 message: 'Internal server error',
             });
         }
-        prisma_1.default
-            .$disconnect()
-            .then(res => {
-            console.log('disconnected');
-        })
-            .catch(err => {
-            console.log('error at disconnected');
-        });
+        finally {
+            prisma_1.default
+                .$disconnect()
+                .then(res => {
+                console.log('disconnected');
+            })
+                .catch(err => {
+                console.log('error at disconnected');
+            });
+        }
     });
 }
 exports.default = handler;

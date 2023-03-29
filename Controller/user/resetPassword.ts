@@ -109,5 +109,14 @@ export default async function handler(req: Request, res: Response<Data>) {
 		res
 			.status(500)
 			.json({ success: false, error: true, reason: 'Internal server error' });
+	} finally {
+		prisma
+			.$disconnect()
+			.then(res => {
+				console.log('prisma disconnected');
+			})
+			.catch(err => {
+				console.log('error disconecting prisma');
+			});
 	}
 }

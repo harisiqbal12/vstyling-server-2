@@ -107,7 +107,7 @@ export default async function handler(req: Request, res: Response<Data>) {
 				applied: true,
 			},
 		});
-    
+
 		await prisma.users.update({
 			where: {
 				email: result?.email,
@@ -125,5 +125,14 @@ export default async function handler(req: Request, res: Response<Data>) {
 			error: true,
 			message: 'Internal server error',
 		});
+	} finally {
+		prisma
+			.$disconnect()
+			.then(res => {
+				console.log('prisma disconnected');
+			})
+			.catch(err => {
+				console.log('error disconecting prisma');
+			});
 	}
 }

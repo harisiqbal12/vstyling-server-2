@@ -23,7 +23,8 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.user = exports.validation = exports.emails = void 0;
+exports.auth = exports.user = exports.validation = exports.emails = void 0;
 exports.emails = __importStar(require("./emails"));
 exports.validation = __importStar(require("./validation"));
 exports.user = __importStar(require("./user"));
+exports.auth = __importStar(require("./auth"));

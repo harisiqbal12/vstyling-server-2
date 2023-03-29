@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 
 import { sendEmail } from '../../utils';
-import prisma from '../../prisma';
 
 type Data = {
 	success: boolean;
