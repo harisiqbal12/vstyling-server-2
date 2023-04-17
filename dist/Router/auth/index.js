@@ -8,4 +8,5 @@ const Controller_1 = require("../../Controller");
 const router = express_1.default.Router();
 router.route('/login').post(Controller_1.auth.login);
 router.route('/authenticate').post(Controller_1.auth.authenticate);
+router.route('/updatePassword').post(Controller_1.auth.changePassword);
 exports.default = router;

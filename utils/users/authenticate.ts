@@ -9,8 +9,6 @@ export default async function handler(token: string): Promise<{
 	if (admin.apps.length) {
 		const res = await admin.auth(admin.app()).verifyIdToken(token);
 
-		console.log(res);
-
 		return {
 			name: res?.name,
 			email: res?.email || null,
@@ -23,8 +21,6 @@ export default async function handler(token: string): Promise<{
 	});
 
 	const res = await admin.auth(admin.app()).verifyIdToken(token);
-
-	console.log(res);
 
 	return {
 		name: res?.name || null,

@@ -15,9 +15,6 @@ type Data = {
 
 export default async function handler(req: Request, res: Response<Data>) {
 	try {
-		console.log(req?.body?.token);
-		console.log('body');
-
 		if (!req?.body?.token) {
 			let err = new Error();
 			Object.assign(err, {
@@ -76,7 +73,6 @@ export default async function handler(req: Request, res: Response<Data>) {
 			expired: false,
 		});
 	} catch (err) {
-		console.log(err);
 
 		//@ts-ignore
 		const code: string = err?.code;
@@ -110,6 +106,7 @@ export default async function handler(req: Request, res: Response<Data>) {
 		}
 
 		if (code === 'auth/id-token-expired') {
+			console.log('token expired');
 			res.status(400).json({
 				success: false,
 				error: true,

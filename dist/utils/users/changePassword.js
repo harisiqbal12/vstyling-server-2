@@ -12,11 +12,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const auth_1 = require("firebase/auth");
 const client_config_1 = require("./client-config");
 const auth = (0, auth_1.getAuth)(client_config_1.app);
-function handler(email, password) {
+function handler(password, email, newPassword) {
     return __awaiter(this, void 0, void 0, function* () {
-        const res = yield (0, auth_1.signInWithEmailAndPassword)(auth, email, password);
-        const token = yield res.user.getIdToken();
-        return token;
+        const user = yield (0, auth_1.signInWithEmailAndPassword)(auth, email, password);
+        yield (0, auth_1.updatePassword)(user.user, newPassword);
     });
 }
 exports.default = handler;

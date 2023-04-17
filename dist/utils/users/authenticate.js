@@ -41,7 +41,6 @@ function handler(token) {
     return __awaiter(this, void 0, void 0, function* () {
         if (admin.apps.length) {
             const res = yield admin.auth(admin.app()).verifyIdToken(token);
-            console.log(res);
             return {
                 name: res === null || res === void 0 ? void 0 : res.name,
                 email: (res === null || res === void 0 ? void 0 : res.email) || null,
@@ -52,7 +51,6 @@ function handler(token) {
             credential: admin.credential.cert(xplorecreations_json_1.default),
         });
         const res = yield admin.auth(admin.app()).verifyIdToken(token);
-        console.log(res);
         return {
             name: (res === null || res === void 0 ? void 0 : res.name) || null,
             email: (res === null || res === void 0 ? void 0 : res.email) || null,

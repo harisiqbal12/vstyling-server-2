@@ -15,12 +15,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const prisma_1 = __importDefault(require("../../prisma"));
 const utils_1 = require("../../utils");
 function handler(req, res) {
-    var _a, _b;
+    var _a;
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            console.log((_a = req === null || req === void 0 ? void 0 : req.body) === null || _a === void 0 ? void 0 : _a.token);
-            console.log('body');
-            if (!((_b = req === null || req === void 0 ? void 0 : req.body) === null || _b === void 0 ? void 0 : _b.token)) {
+            if (!((_a = req === null || req === void 0 ? void 0 : req.body) === null || _a === void 0 ? void 0 : _a.token)) {
                 let err = new Error();
                 Object.assign(err, {
                     code: 'auth/invalid-request',
@@ -69,7 +67,6 @@ function handler(req, res) {
             });
         }
         catch (err) {
-            console.log(err);
             //@ts-ignore
             const code = err === null || err === void 0 ? void 0 : err.code;
             if (code === "auth/invalid-custom-token'") {
@@ -99,6 +96,7 @@ function handler(req, res) {
                 return;
             }
             if (code === 'auth/id-token-expired') {
+                console.log('token expired');
                 res.status(400).json({
                     success: false,
                     error: true,
