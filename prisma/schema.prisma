@@ -115,19 +115,23 @@ model Users {
   emailverify Boolean? @default(false)
   status      Boolean? @default(true)
   lock        Boolean? @default(false)
-  businessId  String   @unique
+  businessId  String?  @unique
 
-  createdAt    DateTime        @default(now())
-  addresses    Addresses[]     @relation("UsersAddresses")
-  credits      Credit[]        @relation("userCredits")
-  orders       Orders[]        @relation("userOrder")
-  reviews      Reviews[]       @relation("userReview")
-  transactions Transaction[]   @relation("userTransactions")
-  Shop         BusinessDetails @relation("userShop", fields: [businessId], references: [id])
-  coupons      Coupons[]       @relation("appliedCoupons")
-  wishlist     Wishlist[]      @relation("userWishlist")
+  userType UserType? @default(ONLINE)
+
+  addresses    Addresses[]   @relation("UsersAddresses")
+  credits      Credit[]      @relation("userCredits")
+  orders       Orders[]      @relation("userOrder")
+  reviews      Reviews[]     @relation("userReview")
+  transactions Transaction[] @relation("userTransactions")
+  coupons      Coupons[]     @relation("appliedCoupons")
+  wishlist     Wishlist[]    @relation("userWishlist")
+
+  Shop BusinessDetails? @relation("userShop", fields: [businessId], references: [id])
 
   approved Boolean? @default(false)
+
+  createdAt DateTime @default(now())
 }
 
 model BusinessDetails {
@@ -162,47 +166,125 @@ model Addresses {
   orders         Orders[] @relation("orderAddress")
 }
 
+model Prices {
+  id             String @id @default(uuid())
+  purchase_price Float
+  selling_price  Float
+  discount_price Float
+
+  tier1_price Float?
+  tier2_price Float?
+  tier3_price Float?
+  tier4_price Float?
+
+  product_id String
+  product    Products @relation("productPrice", fields: [product_id], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model Stock {
+  id String @id @default(uuid())
+
+  quantity Int
+
+  type StockType @default(INTERNAL)
+
+  vendor_id   String?
+  vendor      Vendor?   @relation("stockVendor", fields: [vendor_id], references: [id])
+  purchase_id String?
+  purchase    Purchase? @relation("stockPurchase", fields: [purchase_id], references: [id])
+  product_id  String
+  product     Products  @relation("productStock", fields: [product_id], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model PurchaseRecord {
+  id String @id @default(uuid())
+
+  paid   Boolean @default(false)
+  amount Float
+
+  createdAt DateTime @default(now())
+}
+
+model Purchase {
+  id String @id @default(uuid())
+
+  vendor_id String
+  vendor    Vendor  @relation("vendorPurchase", fields: [vendor_id], references: [id])
+  stock     Stock[] @relation("stockPurchase")
+  paid      Boolean @default(false)
+
+  total Float
+
+  createdAt DateTime @default(now())
+}
+
+model Vendor {
+  id   String @id @default(uuid())
+  code String @unique
+  name String
+
+  //@address
+  street       String
+  city         String
+  state        String
+  zip          String
+  country      String
+  //mailing address
+  number       String
+  officeNumber String?
+  website      String?
+  email        String?
+  note         String
+
+  comapyName String
+
+  stocks Stock[]    @relation("stockVendor")
+  bought Purchase[] @relation("vendorPurchase")
+
+  createdAt DateTime @default(now())
+}
+
 model Products {
-  id                String          @id @default(uuid())
-  name              String
-  slug              String          @unique
-  sku               String
-  code              String          @unique
-  imageURI          String
-  quantity          Int
-  purchase_price    Float
-  selling_price     Float
-  discount_price    Float
-  tier1_price       Float?
-  tier2_price       Float?
-  tier3_price       Float?
-  tier4_price       Float?
+  id       String @id @default(uuid())
+  name     String
+  slug     String @unique
+  sku      String
+  code     String @unique
+  imageURI String
+
   tags              String[]
   galleryImage      String[]
   short_description String?
   long_description  String?
   additional_info   String?
   notes             String?
-  hot_deals         Boolean?        @default(false)
-  featured          Boolean?        @default(false)
-  new_arrival       Boolean?        @default(false)
-  special_offer     Boolean?        @default(false)
-  special_deals     Boolean?        @default(false)
-  status            Boolean?        @default(true)
+  hot_deals         Boolean? @default(false)
+  featured          Boolean? @default(false)
+  new_arrival       Boolean? @default(false)
+  special_offer     Boolean? @default(false)
+  special_deals     Boolean? @default(false)
+  status            Boolean? @default(true)
   main_category_id  String
   sub_category_id   String?
   brand_id          String?
-  createdAt         DateTime        @default(now())
-  updatedAt         DateTime        @updatedAt
-  orderProduct      ProductOrders[] @relation("productsOrders")
-  brands            Brands?         @relation("Brands", fields: [brand_id], references: [id])
-  main_category     Categories      @relation("MainCategory", fields: [main_category_id], references: [id])
-  sub_category      Categories?     @relation("SubCategory", fields: [sub_category_id], references: [id])
-  reviews           Reviews[]       @relation("productReview")
-  variants          Variants[]      @relation("variantProduct")
-  filters           Filters[]       @relation("productFilters")
 
-  wishlist Wishlist[] @relation("wishlistProduct")
+  orderProduct  ProductOrders[] @relation("productsOrders")
+  brands        Brands?         @relation("Brands", fields: [brand_id], references: [id])
+  main_category Categories      @relation("MainCategory", fields: [main_category_id], references: [id])
+  sub_category  Categories?     @relation("SubCategory", fields: [sub_category_id], references: [id])
+  reviews       Reviews[]       @relation("productReview")
+  variants      Variants[]      @relation("variantProduct")
+  filters       Filters[]       @relation("productFilters")
+  wishlist      Wishlist[]      @relation("wishlistProduct")
+  price         Prices[]        @relation("productPrice")
+  stock         Stock[]         @relation("productStock")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Variants {
@@ -390,4 +472,14 @@ enum TransactionType {
   STRIPE
   CREDIT
   CREDITPAYMENT
+}
+
+enum StockType {
+  EXTERNAL
+  INTERNAL
+}
+
+enum UserType {
+  ONLINE
+  OFFLINE
 }
