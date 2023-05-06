@@ -1,5 +1,5 @@
 import * as admin from 'firebase-admin';
-import serviceAccount from '../../xplorecreations.json';
+import serviceAccount from '../../service.json';
 
 export default async function handler(email: string): Promise<string> {
 	if (admin.apps.length) {

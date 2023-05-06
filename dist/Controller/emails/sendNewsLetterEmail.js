@@ -14,7 +14,6 @@ function handler(req, res) {
     var _a;
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            console.log(req === null || req === void 0 ? void 0 : req.body);
             if (!((_a = req === null || req === void 0 ? void 0 : req.body) === null || _a === void 0 ? void 0 : _a.email)) {
                 res.status(400).json({
                     success: false,
@@ -32,6 +31,7 @@ function handler(req, res) {
             });
         }
         catch (err) {
+            console.log(err);
             res.status(500).json({
                 success: false,
                 error: true,

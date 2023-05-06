@@ -6,12 +6,10 @@ class SendMail {
 
 	constructor() {
 		this.transporter = nodemailer.createTransport({
-			host: 'services.xplorecreations.com',
-			port: 465,
-			secure: true,
+			service: 'yahoo',
 			auth: {
-				user: 'no-reply@services.xplorecreations.com',
-				pass: 'R,Gu&5IWmtHg',
+				user: 'virtualstyling@yahoo.com',
+				pass: '2pD-!s4E7FBwpie',
 			},
 		});
 	}
@@ -20,9 +18,9 @@ class SendMail {
 		return new Promise((resolve, reject) => {
 			this.transporter
 				?.sendMail({
-					from: "'Xplorecreations' <no-reply@services.xplorecreations.com>",
+					from: "'Vstyling' <virtualstyling@yahoo.com>",
 					to: email,
-					subject: 'Welcome to Xplorecreation',
+					subject: 'Welcome to Vstyling',
 					html: Template.verificationTemplate({ link }),
 				})
 				.then(res => {
@@ -38,7 +36,7 @@ class SendMail {
 		return new Promise((resolve, reject) => {
 			this?.transporter
 				?.sendMail({
-					from: "'Xplorecreations' <no-reply@services.xplorecreations.com>",
+					from: "'Vstyling' <virtualstyling@yahoo.com>",
 					to: email,
 					subject: 'Newsletter',
 					html: Template.newsLetter(),
@@ -56,7 +54,7 @@ class SendMail {
 		return new Promise((resolve, reject) => {
 			this?.transporter
 				?.sendMail({
-					from: "'Xplorecreations' <no-reply@services.xplorecreations.com>",
+					from: "'Vstyling' <virtualstyling@yahoo.com>",
 					to: email,
 					subject: 'Reset password',
 					html: Template.resetPassword({ link }),
@@ -84,7 +82,7 @@ class SendMail {
 		return new Promise((resolve, reject) => {
 			this?.transporter
 				?.sendMail({
-					from: "'Xplorecreations' <no-reply@services.xplorecreations.com>",
+					from: "'Vstyling' <virtualstyling@yahoo.com>",
 					to: email,
 					subject: 'Order status updated',
 					html: Template.orderStatus({ status, id: orderId, name }),
@@ -118,7 +116,7 @@ class SendMail {
 		return new Promise((resolve, reject) => {
 			this?.transporter
 				?.sendMail({
-					from: "'Xplorecreations' <no-reply@services.xplorecreations.com>",
+					from: "'Vstyling' <virtualstyling@yahoo.com>",
 					to: email,
 					subject: 'Order confirm',
 					html: Template.orderConfirm({ data, total, subtotal }),

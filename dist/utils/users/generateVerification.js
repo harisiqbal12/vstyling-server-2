@@ -36,7 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const admin = __importStar(require("firebase-admin"));
-const xplorecreations_json_1 = __importDefault(require("../../xplorecreations.json"));
+const service_json_1 = __importDefault(require("../../service.json"));
 function handler(email) {
     return __awaiter(this, void 0, void 0, function* () {
         if (admin.apps.length) {
@@ -47,7 +47,7 @@ function handler(email) {
         }
         admin.initializeApp({
             //@ts-ignore
-            credential: admin.credential.cert(xplorecreations_json_1.default),
+            credential: admin.credential.cert(service_json_1.default),
         });
         const link = yield admin.auth(admin.app()).generateEmailVerificationLink(email);
         return link;

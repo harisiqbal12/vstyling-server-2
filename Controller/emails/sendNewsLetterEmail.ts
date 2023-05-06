@@ -5,7 +5,6 @@ import { sendEmail } from '../../utils';
 
 export default async function handler(req: Request, res: Response) {
 	try {
-		console.log(req?.body);
 		if (!req?.body?.email) {
 			res.status(400).json({
 				success: false,
@@ -26,6 +25,8 @@ export default async function handler(req: Request, res: Response) {
 			error: false,
 		});
 	} catch (err) {
+
+		console.log(err)
 		res.status(500).json({
 			success: false,
 			error: true,

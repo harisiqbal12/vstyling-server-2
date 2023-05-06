@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import * as admin from 'firebase-admin';
 import prisma from '../../prisma';
-import serviceAccount from '../../xplorecreations.json';
+import serviceAccount from '../../service.json'
 
 type Data = {
 	success: boolean;

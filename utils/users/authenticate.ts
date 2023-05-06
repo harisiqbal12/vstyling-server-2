@@ -1,6 +1,6 @@
 import * as admin from 'firebase-admin';
 
-import serviceAccount from '../../xplorecreations.json';
+import serviceAccount from '../../service.json';
 
 export default async function handler(token: string): Promise<{
 	name: string | null;
