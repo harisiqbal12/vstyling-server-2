@@ -83,6 +83,8 @@ export default async function handler(req: Request, res: Response<Data>) {
 			message: null,
 		});
 	} catch (err) {
+		console.log(err)
+
 		//@ts-ignore
 		const code: string = err?.code;
 

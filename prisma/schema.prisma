@@ -3,19 +3,17 @@ generator client {
 }
 
 datasource db {
-  provider          = "postgresql"
-  url               = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Wishlist {
-  id String @id @default(uuid())
-
+  id         String    @id @default(uuid())
   product_id String?
-  product    Products? @relation(name: "wishlistProduct", fields: [product_id], references: [id])
   user_id    String
-  user       Users?    @relation(name: "userWishlist", fields: [user_id], references: [id])
-
-  createdAt DateTime @default(now())
+  createdAt  DateTime  @default(now())
+  product    Products? @relation("wishlistProduct", fields: [product_id], references: [id])
+  user       Users     @relation("userWishlist", fields: [user_id], references: [id])
 }
 
 model Coupons {
@@ -33,14 +31,13 @@ model Transaction {
   amount    Float
   credit_id String?
   stripeTrx String?
-  order_id  String?
   type      TransactionType
   createdAt DateTime        @default(now())
   user_id   String?
+  order_id  String?
   credit    Credit?         @relation("creditTransaction", fields: [credit_id], references: [id])
+  order     Orders?         @relation("orderTransaction", fields: [order_id], references: [id])
   user      Users?          @relation("userTransactions", fields: [user_id], references: [id])
-
-  order Orders? @relation(name: "orderTransaction", fields: [order_id], references: [id])
 }
 
 model NewsLetter {
@@ -62,15 +59,14 @@ model Reviews {
 }
 
 model SliderImages {
-  id          String  @id @default(uuid())
+  id          String    @id @default(uuid())
   images      String
-  header      String?
-  title       String?
+  type        ImageType
+  createdAt   DateTime  @default(now())
   description String?
+  header      String?
   link        String?
-
-  type      ImageType
-  createdAt DateTime  @default(now())
+  title       String?
 }
 
 model Footer {
@@ -100,37 +96,32 @@ model Credit {
   updatedAt      DateTime      @updatedAt
   createdAt      DateTime      @default(now())
   expired        Boolean?      @default(false)
+  paid           Boolean       @default(false)
   user           Users         @relation("userCredits", fields: [userId], references: [id])
   transaction    Transaction[] @relation("creditTransaction")
-  paid           Boolean       @default(false)
 }
 
 model Users {
-  id          String   @id @default(uuid())
-  name        String
-  email       String   @unique
-  number      String?  @unique
-  tier        Int?     @default(0)
-  emailverify Boolean? @default(false)
-  status      Boolean? @default(true)
-  lock        Boolean? @default(false)
-  businessId  String?  @unique
-
-  userType UserType? @default(ONLINE)
-
-  addresses    Addresses[]   @relation("UsersAddresses")
-  credits      Credit[]      @relation("userCredits")
-  orders       Orders[]      @relation("userOrder")
-  reviews      Reviews[]     @relation("userReview")
-  transactions Transaction[] @relation("userTransactions")
-  coupons      Coupons[]     @relation("appliedCoupons")
-  wishlist     Wishlist[]    @relation("userWishlist")
-
-  Shop BusinessDetails? @relation("userShop", fields: [businessId], references: [id])
-
-  approved Boolean? @default(false)
-
-  createdAt DateTime @default(now())
+  id           String           @id @default(uuid())
+  name         String
+  email        String           @unique
+  number       String?          @unique
+  tier         Int?             @default(0)
+  emailverify  Boolean?         @default(false)
+  status       Boolean?         @default(true)
+  lock         Boolean?         @default(false)
+  businessId   String?          @unique
+  createdAt    DateTime         @default(now())
+  approved     Boolean?         @default(false)
+  userType     UserType?        @default(ONLINE)
+  addresses    Addresses[]      @relation("UsersAddresses")
+  credits      Credit[]         @relation("userCredits")
+  orders       Orders[]         @relation("userOrder")
+  reviews      Reviews[]        @relation("userReview")
+  transactions Transaction[]    @relation("userTransactions")
+  Shop         BusinessDetails? @relation("userShop", fields: [businessId], references: [id])
+  wishlist     Wishlist[]       @relation("userWishlist")
+  coupons      Coupons[]        @relation("appliedCoupons")
 }
 
 model BusinessDetails {
@@ -140,7 +131,6 @@ model BusinessDetails {
   companyName     String
   salesTaxPermit  String   @unique
   Dba             String   @unique
-  tobaccoPermit   String   @unique
   businessAddress String
   einNumber       String   @unique
   shippingAddress String
@@ -166,124 +156,103 @@ model Addresses {
 }
 
 model Prices {
-  id             String @id @default(uuid())
+  id             String   @id @default(uuid())
+  tier1_price    Float?
+  tier2_price    Float?
+  tier3_price    Float?
+  tier4_price    Float?
+  product_id     String
+  createdAt      DateTime @default(now())
   purchase_price Float
   selling_price  Float
   discount_price Float
-
-  tier1_price Float?
-  tier2_price Float?
-  tier3_price Float?
-  tier4_price Float?
-
-  product_id String
-  product    Products @relation("productPrice", fields: [product_id], references: [id])
-
-  createdAt DateTime @default(now())
+  product        Products @relation("productPrice", fields: [product_id], references: [id])
 }
 
 model Stock {
-  id String @id @default(uuid())
-
-  quantity Int
-
-  type StockType @default(INTERNAL)
-
+  id          String    @id @default(uuid())
+  quantity    Int
+  type        StockType @default(INTERNAL)
   vendor_id   String?
-  vendor      Vendor?   @relation("stockVendor", fields: [vendor_id], references: [id])
   purchase_id String?
-  purchase    Purchase? @relation("stockPurchase", fields: [purchase_id], references: [id])
   product_id  String
+  createdAt   DateTime  @default(now())
   product     Products  @relation("productStock", fields: [product_id], references: [id])
-
-  createdAt DateTime @default(now())
+  purchase    Purchase? @relation("stockPurchase", fields: [purchase_id], references: [id])
+  vendor      Vendor?   @relation("stockVendor", fields: [vendor_id], references: [id])
 }
 
 model PurchaseRecord {
-  id String @id @default(uuid())
-
-  paid   Boolean @default(false)
-  amount Float
-
+  id        String   @id @default(uuid())
+  paid      Boolean  @default(false)
+  amount    Float
   createdAt DateTime @default(now())
 }
 
 model Purchase {
-  id String @id @default(uuid())
-
+  id        String   @id @default(uuid())
   vendor_id String
-  vendor    Vendor  @relation("vendorPurchase", fields: [vendor_id], references: [id])
-  stock     Stock[] @relation("stockPurchase")
-  paid      Boolean @default(false)
-
-  total Float
-
+  total     Float
   createdAt DateTime @default(now())
+  paid      Boolean  @default(false)
+  vendor    Vendor   @relation("vendorPurchase", fields: [vendor_id], references: [id])
+  stock     Stock[]  @relation("stockPurchase")
 }
 
 model Vendor {
-  id   String @id @default(uuid())
-  code String @unique
-  name String
-
-  //@address
+  id           String     @id @default(uuid())
+  code         String     @unique
+  name         String
   street       String
   city         String
   state        String
   zip          String
   country      String
-  //mailing address
   number       String
   officeNumber String?
   website      String?
   email        String?
   note         String
-
-  comapyName String
-
-  stocks Stock[]    @relation("stockVendor")
-  bought Purchase[] @relation("vendorPurchase")
-
-  createdAt DateTime @default(now())
+  createdAt    DateTime   @default(now())
+  comapyName   String
+  bought       Purchase[] @relation("vendorPurchase")
+  stocks       Stock[]    @relation("stockVendor")
 }
 
 model Products {
-  id       String @id @default(uuid())
-  name     String
-  slug     String @unique
-  sku      String
-  code     String @unique
-  imageURI String
-
+  id                String          @id @default(uuid())
+  name              String
+  slug              String          @unique
+  sku               String
+  code              String          @unique
+  imageURI          String
   tags              String[]
   galleryImage      String[]
   short_description String?
   long_description  String?
   additional_info   String?
   notes             String?
-  hot_deals         Boolean? @default(false)
-  featured          Boolean? @default(false)
-  new_arrival       Boolean? @default(false)
-  special_offer     Boolean? @default(false)
-  special_deals     Boolean? @default(false)
-  status            Boolean? @default(true)
+  hot_deals         Boolean?        @default(false)
+  featured          Boolean?        @default(false)
+  new_arrival       Boolean?        @default(false)
+  special_offer     Boolean?        @default(false)
+  special_deals     Boolean?        @default(false)
+  status            Boolean?        @default(true)
   main_category_id  String
   sub_category_id   String?
   brand_id          String?
-
-  orderProduct  ProductOrders[] @relation("productsOrders")
-  brands        Brands?         @relation("Brands", fields: [brand_id], references: [id])
-  main_category Categories      @relation("MainCategory", fields: [main_category_id], references: [id])
-  sub_category  Categories?     @relation("SubCategory", fields: [sub_category_id], references: [id])
-  reviews       Reviews[]       @relation("productReview")
-  variants      Variants[]      @relation("variantProduct")
-  filters       Filters[]       @relation("productFilters")
-  wishlist      Wishlist[]      @relation("wishlistProduct")
-  price         Prices[]        @relation("productPrice")
-  stock         Stock[]         @relation("productStock")
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  price             Prices[]        @relation("productPrice")
+  orderProduct      ProductOrders[] @relation("productsOrders")
+  brands            Brands?         @relation("Brands", fields: [brand_id], references: [id])
+  main_category     Categories      @relation("MainCategory", fields: [main_category_id], references: [id])
+  sub_category      Categories?     @relation("SubCategory", fields: [sub_category_id], references: [id])
+  reviews           Reviews[]       @relation("productReview")
+  stock             Stock[]         @relation("productStock")
+  variants          Variants[]      @relation("variantProduct")
+  wishlist          Wishlist[]      @relation("wishlistProduct")
+  filters           Filters[]       @relation("productFilters")
 }
 
 model Variants {
@@ -339,20 +308,18 @@ model Brands {
   slug         String       @unique
   imageURI     String?
   category_id  String?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  active       Boolean?     @default(true)
+  descriptions String?
+  icon         String?
   category     Categories?  @relation("brandCategories", fields: [category_id], references: [id])
   filters      FilterType[] @relation("filtersBrands")
   products     Products[]   @relation("Brands")
-  active       Boolean?     @default(true)
-  icon         String?
-  descriptions String?
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
 }
 
 model Orders {
-  id String @id @default(uuid())
-  // transaction_id String? @unique
-
+  id            String          @id @default(uuid())
   total_price   Float
   subtotal      Float
   order_id      Int?            @unique @default(autoincrement())
@@ -365,8 +332,7 @@ model Orders {
   Address       Addresses       @relation("orderAddress", fields: [address_id], references: [id])
   user          Users?          @relation("userOrder", fields: [user_id], references: [id])
   orderProducts ProductOrders[] @relation("orderProducts")
-
-  transaction Transaction[] @relation(name: "orderTransaction")
+  transaction   Transaction[]   @relation("orderTransaction")
 }
 
 model ProductOrders {
@@ -384,27 +350,30 @@ model ProductOrders {
 }
 
 model FilterType {
-  id          String      @id @default(uuid())
-  name        String
-  slug        String
-  category_id String?
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @default(now())
-  brand_id    String?
-  brand       Brands?     @relation("filtersBrands", fields: [brand_id], references: [id])
-  category    Categories? @relation("filtersCategory", fields: [category_id], references: [id])
-  filters     Filters[]   @relation("additionalFilters")
+  id                                       String      @id @default(uuid())
+  name                                     String
+  slug                                     String
+  category_id                              String?
+  createdAt                                DateTime    @default(now())
+  updatedAt                                DateTime    @default(now())
+  brand_id                                 String?
+  connected_id                             String?
+  brand                                    Brands?     @relation("filtersBrands", fields: [brand_id], references: [id])
+  category                                 Categories? @relation("filtersCategory", fields: [category_id], references: [id])
+  Filters_FilterType_connected_idToFilters Filters?    @relation("FilterType_connected_idToFilters", fields: [connected_id], references: [id])
+  filters                                  Filters[]   @relation("additionalFilters")
 }
 
 model Filters {
-  id           String      @id @default(uuid())
-  name         String
-  slug         String
-  filterTypeId String?
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @default(now())
-  filtersTypes FilterType? @relation("additionalFilters", fields: [filterTypeId], references: [id])
-  products     Products[]  @relation("productFilters")
+  id                                          String       @id @default(uuid())
+  name                                        String
+  slug                                        String
+  filterTypeId                                String?
+  createdAt                                   DateTime     @default(now())
+  updatedAt                                   DateTime     @default(now())
+  FilterType_FilterType_connected_idToFilters FilterType[] @relation("FilterType_connected_idToFilters")
+  filtersTypes                                FilterType?  @relation("additionalFilters", fields: [filterTypeId], references: [id])
+  products                                    Products[]   @relation("productFilters")
 }
 
 enum CategoriesTypes {
@@ -426,19 +395,6 @@ enum OrderStatus {
   SHIPPED
   COMPLETED
   CANCELLED
-}
-
-enum BusinessSellerType {
-  SHOPOWNER
-  JOBBER
-  DISTRIBUTER
-}
-
-enum BusinesType {
-  VAPESHOP
-  SMOKESHOP
-  DISPENSARY
-  PACKAGING
 }
 
 enum ImageType {
@@ -465,12 +421,14 @@ enum OrderType {
   CARD
   CREDIT
   HYBRID
+  OFFLINE
 }
 
 enum TransactionType {
   STRIPE
   CREDIT
   CREDITPAYMENT
+  OFFLINE
 }
 
 enum StockType {

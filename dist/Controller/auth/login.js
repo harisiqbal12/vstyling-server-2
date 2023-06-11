@@ -76,6 +76,7 @@ function handler(req, res) {
             });
         }
         catch (err) {
+            console.log(err);
             //@ts-ignore
             const code = err === null || err === void 0 ? void 0 : err.code;
             if (code === 'auth/invalid-request') {

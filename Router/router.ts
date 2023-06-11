@@ -8,7 +8,7 @@ import auth from './auth';
 const router = express.Router();
 
 router.route('/').get((_req, res) => {
-	res.status(200).send('<h2>Explore Creation Socket Server</h2>');
+	res.status(200).send('<h2>Vstyling Socket Server</h2>');
 });
 
 router.use('/validation', validation);

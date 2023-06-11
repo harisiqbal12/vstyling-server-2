@@ -7,5 +7,6 @@ const router = express.Router();
 router.route('/login').post(auth.login);
 router.route('/authenticate').post(auth.authenticate);
 router.route('/updatePassword').post(auth.changePassword);
+router.route("/register").post(auth.register)
 
 export default router;

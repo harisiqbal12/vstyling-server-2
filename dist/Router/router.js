@@ -10,7 +10,7 @@ const actions_1 = __importDefault(require("./actions"));
 const auth_1 = __importDefault(require("./auth"));
 const router = express_1.default.Router();
 router.route('/').get((_req, res) => {
-    res.status(200).send('<h2>Explore Creation Socket Server</h2>');
+    res.status(200).send('<h2>Vstyling Socket Server</h2>');
 });
 router.use('/validation', validation_1.default);
 router.use('/email', emails_1.default);
